@@ -1,0 +1,33 @@
+FROM    debian:buster
+
+RUN     apt-get update -yq \
+        && apt-get upgrade -yq \
+        && apt-get install -y php7.3 php-fpm php-mysql mariadb-client
+
+# This line creates a directory /run/php in the container's filesystem
+RUN     mkdir -p /run/php
+
+# This line installs the wget package and then removes any unnecessary files and packages using apt-get clean.
+RUN     apt-get install wget -y && apt-get clean -y
+
+# This line downloads the wp-cli.phar file from GitHub using wget, makes it executable using chmod, and then moves it to /usr/local/bin/wp so that it is globally accessible.
+RUN     wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+        && chmod +x wp-cli.phar \
+        && mv wp-cli.phar /usr/local/bin/wp
+
+# These lines create the /var/www/html directory and then change the owner and group to root.
+RUN     mkdir -p /var/www/html
+RUN     chown -R root:root /var/www/html
+
+# This line copies the www.conf file to the /etc/php/7.3/fpm/pool.d/ directory in the container's filesystem and then sets the file permissions to 755.
+COPY    conf/www.conf   /etc/php/7.3/fpm/pool.d/www.conf
+RUN     chmod 755       /etc/php/7.3/fpm/pool.d/www.conf
+
+COPY    ./tools/wp_config.sh     /etc/wordpress/wp_config.sh
+RUN     chmod 775               /etc/wordpress/wp_config.sh
+
+EXPOSE 9000
+
+WORKDIR /var/www/html
+
+ENTRYPOINT ["/bin/bash", "/etc/wordpress/wp_config.sh"]

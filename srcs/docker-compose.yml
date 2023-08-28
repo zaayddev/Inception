@@ -1,0 +1,87 @@
+version: '3.7'
+
+services:
+  nginx: 
+    container_name: nginx 
+    hostname: nginx
+    depends_on:
+      - mariadb
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - inception
+    ports: 
+      - "443:443"
+    volumes: 
+      - wordpress_v:/var/www/html
+    env_file: .env
+
+  mariadb:
+    container_name: mariadb
+    hostname: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - inception
+    volumes:
+      - mariadb_v:/var/lib/mysql
+    env_file: .env
+      
+  wordpress:
+    container_name: wordpress
+    hostname: wordpress
+    depends_on:
+      - mariadb
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+    volumes:
+       - wordpress_v:/var/www/html
+    restart: unless-stopped
+    networks:
+      - inception
+    env_file: .env
+
+  adminer:
+    depends_on:
+      - mariadb
+    container_name: adminer
+    image: adminer
+    ports:
+      -  "1111:1111"
+    build: ./requirements/bonus/Adminer
+    networks:
+      - inception
+    restart: unless-stopped
+
+  static_website:
+    container_name: static_website
+    image: static_website
+    build: ./requirements/bonus/static_website
+    ports:
+      - "1234:1234"
+    networks:
+      - inception
+    restart: unless-stopped
+
+volumes:
+  wordpress_v:
+    driver: local  # driver:local means that the volume is stored on the host machine
+    driver_opts:
+      type: none   # type: none option specifies that the volume is not created from a pre-existing volume or image
+      o: bind
+      device: ${DATA_FOLDER}/wordpress
+       
+  mariadb_v:
+     driver: local 
+     driver_opts:
+       type: none
+       o: bind
+       device: ${DATA_FOLDER}/mariadb
+
+networks:
+  inception:

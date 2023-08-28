@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inception Movie Poster and Quote</title>
+    <style>
+      /* center container horizontally and vertically */
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      
+      /* display container vertically */
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      
+      /* define custom font */
+      @font-face {
+        font-family: "CustomFont";
+        src: url("path/to/font.woff2") format("woff2"),
+             url("path/to/font.woff") format("woff");
+        /* add more font file formats as needed */
+        /* use relative or absolute paths to the font files */
+      }
+      
+      /* apply custom font to title */
+      h1 {
+        font-family: "CustomFont", sans-serif;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img src="https://www.amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg"
+           alt="Inception Movie Poster">
+      <h1>If you're going to perform inception, you need imagination.</h1>
+	  <h1>You need the simplest version of the idea-the one that will grow naturally in the subject's mind. Subtle art.</h1>
+    </div>
+  </body>
+</html>

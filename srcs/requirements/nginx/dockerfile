@@ -1,0 +1,37 @@
+FROM debian:buster
+
+RUN apt update -yq \
+	&& apt-get upgrade -yq \
+	&& apt install nginx -yq
+
+RUN mkdir -p /etc/nginx/ssl \
+	&& apt-get install openssl -yq \
+	&& chmod 755 /etc/nginx/ssl
+	
+# SSL (Secure Sockets Layer) and its successor, TLS (Transport Layer Security), 
+# are protocols for establishing authenticated and encrypted links between networked computers.
+RUN openssl req\
+			-new\
+			-nodes\
+			-x509\
+			-out /etc/nginx/ssl/42_inception.crt\
+			-keyout /etc/nginx/ssl/42_inception.key\
+			-subj "/C=MA/L=Khouribga/O=1337 School/OU=zchbani/CN=zchbani.42.fr"\
+			&& apt-get clean -y
+
+# chown command is changing the ownership of the directory to the user and group www-data. 
+# The -R option is used to recursively apply the ownership change to all files and directories within /var/www/html.
+# these two commands are commonly used in Dockerfiles for web applications to set the correct file permissions and 
+# ownership for the files and directories in the web server's document root directory, /var/www/html
+RUN	chmod 755 /var/www/html \
+    && chown -R www-data:www-data /var/www/html
+
+EXPOSE 443
+
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+
+# the daemon off; directive tells Nginx to stay in the foreground. For containers this is useful 
+# as best practice is for one container = one process. One server (container) has only one service.
+# running a program in the foreground means running it in the container's main process and allowing Docker to manage the container's lifecycle. 
+# Running a program in the background means running it as a separate process in the container and detaching it from the container's main process.
+CMD ["nginx",  "-g",  "daemon off;"]

@@ -1,0 +1,18 @@
+FROM debian:buster
+
+RUN apt-get update -yq \
+	&& apt-get upgrade -yq \
+	&& apt-get install mariadb-server -yq \
+	&& apt-get install mariadb-client -yq
+
+
+COPY conf/50-server.cnf			/etc/mysql/mariadb.conf.d/50-server.cnf
+COPY tools/manage_database.sh	/etc/mysql/manage_database.sh
+
+RUN	chmod -R 755 /etc/mysql/manage_database.sh
+
+RUN chmod -R 755 /etc/mysql/mariadb.conf.d/50-server.cnf
+
+EXPOSE 3306
+
+ENTRYPOINT ["/bin/bash", "/etc/mysql/manage_database.sh"]
